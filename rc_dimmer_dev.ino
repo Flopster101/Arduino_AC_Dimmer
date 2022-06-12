@@ -3,13 +3,19 @@
 
 #include <IRremote.hpp>
 #define SEND_PWM_BY_TIMER
+#include <TimerFreeTone.h>
+#define TONE_PIN 3
+#define TONE_RESPONSE_ENABLE 1  // Set to 0 for disabling beeps on button presses.
 
 #define IR_RECEIVE_PIN 4
+
 
 #include <TimerOne.h>           
 volatile int i=0;               // Variable to use as a counter
 volatile boolean zero_cross=0;  // Boolean to store a "switch" to tell us if we have crossed zero
 volatile boolean power_bool=1;
+boolean tone_enabled=TONE_RESPONSE_ENABLE;
+
 int AC_pin = 5;                 // Output to Opto Triac
 int last_dim = 101;
 int is_first_dim = 1;
@@ -65,6 +71,10 @@ void translateIR() // takes action based on IR code received
     {
     Serial.println("Received! (-)");
     dim_value_print();
+    if (tone_enabled == true)
+    {
+      TimerFreeTone(TONE_PIN, 1760, 15);
+    }
     if (dim<100)  
    {
     dim = dim + 5;
@@ -80,6 +90,10 @@ void translateIR() // takes action based on IR code received
     {
     Serial.println("Received! (+)");
     dim_value_print();
+    if (tone_enabled == true)
+    {
+    TimerFreeTone(TONE_PIN, 2093, 15);
+    }
       {
   if (dim>69)  
   {
@@ -93,6 +107,9 @@ void translateIR() // takes action based on IR code received
   case 0xF40B7708: // Power button on remote
     {
     Serial.println("Received! (ON/OFF)");
+    if (tone_enabled == true) {
+      TimerFreeTone(TONE_PIN, 987, 15);
+    }
        if(power_bool == true)
         {
           Serial.println("Power OFF");
@@ -116,12 +133,32 @@ void translateIR() // takes action based on IR code received
   case 0xE51A7708: // Exit button on remote
     {
       Serial.println("Received! (Exit/RESET)");
+      if (tone_enabled == true) {
+        TimerFreeTone(TONE_PIN, 1046, 15);
+        delay(50);
+        TimerFreeTone(TONE_PIN, 1046, 15);
+      }
       last_dim=101;
       dim=101;
       dim_value_print();
     }
-  }}
-  
+    break;
+  case 0xFE017708: // Info button on remote, used as mute.
+    {
+      Serial.println("Received! (Info/Mute)");
+      if (tone_enabled == true) {
+        tone_enabled=0;
+      }
+      else if (tone_enabled == false) {
+        tone_enabled=1;
+        TimerFreeTone(TONE_PIN, 987, 15);
+        delay(50);
+        TimerFreeTone(TONE_PIN, 987, 15);
+      }
+    }
+  }
+}
+
 void loop() {  
  if (IrReceiver.decode()) { // have we received an IR signal?
     translateIR();
