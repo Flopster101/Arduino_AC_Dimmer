@@ -3,9 +3,13 @@
 This project is based on this guide: https://circuitspedia.com/remote-control-ac-dimmer-arduino/  
 Check it out for extra information.
 
-## Photo of project
+## Photo
 ![project](https://user-images.githubusercontent.com/50512583/173338249-f9d19033-924f-47cf-8ca8-51359fa337f3.png)
 > It's a mess, isn't it?
+
+## Schematic
+![rc_dimmer_arduino_esquemático](https://user-images.githubusercontent.com/50512583/173363683-739a890d-da57-4296-9655-e194628bc8ef.png)
+> Far from being a good schematic, but it'll do.
 
 ## Remote Button Layout
 ![project_remote](https://user-images.githubusercontent.com/50512583/173350540-67a08f2e-c302-44b1-b848-d2fbddbd6b16.png)
