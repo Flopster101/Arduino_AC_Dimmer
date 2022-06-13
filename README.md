@@ -5,6 +5,13 @@ Check it out for extra information.
 
 ## Photo of project
 ![project](https://user-images.githubusercontent.com/50512583/173338249-f9d19033-924f-47cf-8ca8-51359fa337f3.png)
+> It's a mess, isn't it?
+
+## Remote Button Layout
+![project_remote](https://user-images.githubusercontent.com/50512583/173350540-67a08f2e-c302-44b1-b848-d2fbddbd6b16.png)
+> There is dedicated MUTE button, but I decided to use the Info button for easier access.  
+> Feel free to reprogram this project to use whatever remote you have. It can be easily done with the help of SimpleReceiver.
+
 
 ## Components
 
