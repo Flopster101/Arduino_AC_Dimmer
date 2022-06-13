@@ -1,4 +1,4 @@
-// Remote Control AC dimmer v1.0 for Arduino by Flopster101
+// Remote Control AC dimmer v1.0.2 for Arduino by Flopster101
 // Project based on https://circuitspedia.com/remote-control-ac-dimmer-arduino/
 
 #include <IRremote.hpp>
@@ -71,6 +71,7 @@ void translateIR() // takes action based on IR code received
     {
     Serial.println("Received! (-)");
     dim_value_print();
+    power_bool=1;
     if (tone_enabled == true)
     {
       TimerFreeTone(TONE_PIN, 1760, 15);
@@ -90,6 +91,7 @@ void translateIR() // takes action based on IR code received
     {
     Serial.println("Received! (+)");
     dim_value_print();
+    power_bool=1;
     if (tone_enabled == true)
     {
     TimerFreeTone(TONE_PIN, 2093, 15);
@@ -140,6 +142,7 @@ void translateIR() // takes action based on IR code received
       }
       last_dim=101;
       dim=101;
+      power_bool=1;
       dim_value_print();
     }
     break;
