@@ -2,7 +2,7 @@
 // Project based on https://circuitspedia.com/remote-control-ac-dimmer-arduino/
 
 #include <IRremote.hpp>
-#define SEND_PWM_BY_TIMER
+#define SEND_PWM_BY_TIMER       // Recommended by IRRemote documentation
 #include <TimerFreeTone.h>
 #define TONE_PIN 3
 #define TONE_RESPONSE_ENABLE 1  // Set to 0 for disabling beeps on button presses.
@@ -13,7 +13,7 @@
 #include <TimerOne.h>           
 volatile int i=0;               // Variable to use as a counter
 volatile boolean zero_cross=0;  // Boolean to store a "switch" to tell us if we have crossed zero
-volatile boolean power_bool=1;
+volatile boolean power_bool=1;  // Boolean to store the current state of power of the dimmer. Defaults to 1 for ON
 boolean tone_enabled=TONE_RESPONSE_ENABLE;
 
 int AC_pin = 5;                 // Output to Opto Triac
@@ -25,18 +25,18 @@ int dim = 101;                  // Dimming level (0-128)  101 = nearly off, 68 =
 int freqStep = 75;    // This is the delay-per-brightness step in microseconds.
 
 void setup() {   
-  // Start the receiver and if not 3. parameter specified, take LED_BUILTIN pin from the internal boards definition as default feedback LED
+  // Start IRReceiver on the pin defined by IR_RECEIVE_PIN
   IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);
   pinMode(AC_pin, OUTPUT);                          // Set the Triac pin as output
   attachInterrupt(0, zero_cross_detect, RISING);    // Attach an Interupt to Pin 2 (interupt 0) for Zero Cross Detection
   Timer1.initialize(freqStep);                      // Initialize TimerOne library for the freq we need
   Timer1.attachInterrupt(dim_check, freqStep);      
-  Serial.begin(9600);
+  Serial.begin(9600);                               // It has to be 9600 because my Arduino clone will NOT accept 115200
   // Just to know which program is running on my Arduino
   Serial.println(F("START Remote Control Dimmer v1.0 by Flopster101 \r\nUsing IRRemote library version " VERSION_IRREMOTE));
 }
 
-void dim_value_print() // Read current dim value and print to serial console.
+void dim_value_print()              // Read current dim value and print to serial console.
 {
 Serial.println("Dim value:");
 Serial.println(dim);
@@ -44,7 +44,7 @@ Serial.println(dim);
 
 void zero_cross_detect() 
 {    
-  zero_cross = true;               // set the boolean to true to tell our dimming function that a zero cross has occured
+  zero_cross = true;                // set the boolean to true to tell our dimming function that a zero cross has occured
   i=0;
   digitalWrite(AC_pin, LOW);
 }                                 
@@ -54,20 +54,20 @@ void dim_check()
 {                   
   if(zero_cross == true) {              
     if(i>=dim) {                     
-      digitalWrite(AC_pin, HIGH);  // turn on light       
-      i=0;  // reset time step counter                         
-      zero_cross=false;    // reset zero cross detection
+      digitalWrite(AC_pin, HIGH);   // turn on light       
+      i=0;                          // reset time step counter                         
+      zero_cross=false;             // reset zero cross detection
     } 
     else {
-      i++;  // increment time step counter                     
+      i++;                          // increment time step counter                     
 }}}                                      
 
 
-void translateIR() // takes action based on IR code received
+void translateIR()                  // takes action based on IR code received
 {
   switch(IrReceiver.decodedIRData.decodedRawData)
   {
-  case 0xF6097708: // Vol down button on remote
+  case 0xF6097708:                  // Vol down button on remote
     {
     Serial.println("Received! (-)");
     dim_value_print();
@@ -81,7 +81,7 @@ void translateIR() // takes action based on IR code received
     dim = dim + 5;
     if (dim>102) 
     {
-      dim=100; // in vechiul sketch era 127
+      dim=100;
     }
     }}
     
@@ -102,7 +102,7 @@ void translateIR() // takes action based on IR code received
      dim = dim - 5;
   if (dim<68) 
     {
-      dim=68;  // in vechiul sketch era 1
+      dim=68;
     } }}}
     break;
 
@@ -117,7 +117,7 @@ void translateIR() // takes action based on IR code received
           Serial.println("Power OFF");
           power_bool=0;
           last_dim = dim;
-          if (is_first_dim=1) {
+          if (is_first_dim=1) {  // I don't actually remember what this was for, I think it might not be necessary anymore
             dim=100;
             is_first_dim=0;
           }
@@ -166,6 +166,6 @@ void loop() {
  if (IrReceiver.decode()) { // have we received an IR signal?
     translateIR();
     delay(100);
-    IrReceiver.resume(); // Enable receiving of the next value
+    IrReceiver.resume();    // Enable receiving of the next value
  }
 }
